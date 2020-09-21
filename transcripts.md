@@ -97,9 +97,64 @@
 - Now, if our prior is the uniform distribution, and after performing this Bayesian inference, our posterior distribution will become this.
 - We see that the posterior now gives more mass to values around $0.7$ and less mass to values far from it.
 - This is exactly what we want, as our posterior belief is pointing us to the right direction of where the true $\theta$ really is.
+- Now, to estimate $\theta$, we can use a central tendency statistics such as the mean or the mode of the posterior distribution.
+- But more importantly, this posterior distribution allows us quantify our uncertainty about $\theta$ as well: for example, if the posterior is highly concentrated around some number, then we are more certain about our belief; conversely, if the posterior is more spread out, then we are uncertain about $\theta$.
+- This component of uncertainty quantification is what sets Bayesian statistics apart from frequentism and power applications where uncertainty is an important measure.
+- For example, instead of the mean or the mode, sometimes we'd like to quantify the uncertainty of a variable by reporting the 95% credible interval, which we can easily compute from the posterior distribution.
+- Contrasting this with the 95% confidence interval from the frequentist perspective, which in itself is a far more confusing idea, we see that the Bayesian framework allows us to naturally quantify our belief about an unknown variable.
 
 **If need more content**: different priors resulting in different posteriors
 
-- While this example is fairly simple,
+- Overall, while this example is fairly simple, it demonstrates the power of Bayesian statistics in allowing the statistician to incorporate their prior belief in the form of the prior distribution and combine it with the observed data to  obtain a posterior distribution, which offers a natural way to quantify uncertainty.
+- Moreover, even in more complicated applications, the Bayesian framework remains the same: choosing your prior and working out your likelihood function, applying Bayes' theorem to obtain your posterior distribution, and finally extract your analysis from that posterior distribution.
+- So throughout this example, we work with one single latent variable $\theta$, but the application of modeling a single variable can be limited.
+- What if you instead want to model a function, which is in a sense a collection of infinite variables, each defined on a point?
+- Here we turn to Gaussian processes, which are a really convenient mathematical object that allows us to use Bayesian inference to model a function.
 
-### Slide 10:
+### Slide 10: Modeling a latent function
+- Gaussian processes, or GPs, have a special place in Bayesian machine learning, because they offer so much flexibility in modeling functions of various shapes and smoothness.
+- In the simplest sense, having a GP belief on a latent function first means we place a normal distribution prior on every point inside the domain of the latent function.
+- A GP consists of a mean function, which specifies the central tendency of the latent function, and a covariance matrix, which defines covariance of any pair of points within the domain.
+- This covariance matrix in effect controls how smooth we'd like to model our latent function as.
+- By using this normal distribution-based prior on the function, we can actually derive the analytical expression of the posterior GP, conditioned on a set of observations as shown here.
+- This math involves some matrix algebra, especially taking the Cholesky decomposition here.
+- Luckily for us, most Bayesian software, including PyMC, already takes care of this computation.
+- Overall, all we need to know is that after this conditioning, the posterior GP give us access to the posterior distribution of any point inside the domain of the function.
+
+### Slide 11: GP visualizations: prior
+- Let's now look at some examples so that we can have a visual understanding of what a GP can help us do.
+- Say we have an arbitrary function, defined on $[0, 1]$, and we'd like to model it using a GP.
+- A constant or even zero mean function is typically used, while there are many more choices to be made regarding the covariance matrix, with the Matern 5 / 2 being one of the most commonly used, so those are our choices for this example as well.
+- Now, notice that the covariance matrix has its own parameters $\eta$ and $\ell$, which respectively scale the input and output of the function, thus controlling the smoothness of the function.
+- For now, we will set $\eta = 3$ and $\ell = 1$.
+- Before observing any data, our belief about the function entirely depends on the GP prior we are placing on it, which is shown here.
+- The bold line is the mean function plotted across the domain, while the shaded region is plotted by connecting the 95% credible interval (or CI) of each point in the domain, as defined by the prior.
+- This means if you consider any point $x$ here, its prior mean is 0, and its CI is between these two points.
+- For now, there's nothing interesting going on as we haven't observed any data yet, and this visualization is simply of the prior GP.
+
+### Slide 12: GP visualizations: posterior
+- Now, say we observe the value of the function at this specific point, as shown here.
+- After conditioning on this observation, we visualize the posterior GP again using the posterior mean and CI.
+- We see that the posterior mean nicely goes through the observation and the CI is squeezed in the region around it.
+- This is because within a smooth function, values in a small region are relatively similar, so after observing the value of the point here, the uncertainty about the values of surrounding points decreases.
+- The further we move away from the observation, the larger the CI gets, and if we are far away enough, the posterior pretty much reverts back to the prior.
+- Now, as we have more and more observations, our posterior changes in a similar way where uncertainty, encoded in the CI, decreases around the observations.
+- If we take a vertical slice of this plot at any unobserved point $x$, we obtain our posterior belief about $x$.
+- And that is the general procedure of using a GP to model a function, or in other words, regression.
+
+### Slide 13: GP hyper-parameters
+- One note that I brushed over earlier is the choice of the covariance function parameters, which can be viewed as the hyper-parameters of our GP model.
+- Again, these hyper-parameters specify the smoothness of the GP and therefore hugely influences the behavior of the posterior.
+- For example, here are the posterior GPs when these hyper-parameters have different values.
+- Now, within a specific context, a scientist can use their domain knowledge to find the best values for these hyper-parameters, but most of the time, this choice can be inaccurate.
+- A better, more Bayesian strategy is to go hierarchical and place a prior on each of these hyper-parameters, and perform Bayesian inference on them as well.
+- After conditioning on some observations, some point-estimate technique can help us set these hyper-parameters.
+- It is at this point that PyMC sets itself apart from other Bayesian modeling tools using GP.
+- For example, if you were to use scikit-learn's otherwise excellent GP implementation `GaussianProcessRegressor`, you would either need to set the hyper-parameters beforehand or use an optimizer to find their values, which doesn't allow you to encode your preference/expertise via a prior in the optimization.
+
+### Slide 14: GPs in PyMC3
+- Specifically, using PyMC3, I place a Gamma prior on $\ell$ and a Half Cauchy prior on $\eta$ for our running exmaple; this results in the posterior GP here.
+- Now, as I show the true latent function that we're trying to model here, which is a piece of the Gramacy and Lee function, we see that by having this hierarchical structure for our GP, the fit improves from what we had before.
+- As some of you might already know, defining a hierarchical structure for your Bayesian model, by placing priors on parameters that define the priors for other variables, is something that PyMC3 in general allows us to do quite easily, and it is actually what attracts me the most to the library.
+
+### Slide 15:
