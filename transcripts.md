@@ -67,6 +67,8 @@
 - This we can calculate fairly easily: if the true proportion of people preferring Chrome is $\theta$, then each person in our sample has $\theta$ probability of preferring Chrome.
 - Moreover, each person's preference does not affect another's; in other words, each of the numbers is $\mathcal{D}$ is independent from one another.
 - So, using the product rule, we can compute the probability of entire $\mathcal{D}$ as the product of the individual probabilities, denoted here.
+- If we treat the outcome of a person's preference as a binary random variable, we say that the variable follows a Bernoulli distribution with parameter $\theta$.
+- We usually call this the predictive distribution, as it is the belief about the _outcome_ that we'd like to model.
 
 ### Slide 8: Making inference: Bayes' theorem
 - So, we have our prior distribution and our likelihood function.
@@ -155,6 +157,107 @@
 ### Slide 14: GPs in PyMC3
 - Specifically, using PyMC3, I place a Gamma prior on $\ell$ and a Half Cauchy prior on $\eta$ for our running exmaple; this results in the posterior GP here.
 - Now, as I show the true latent function that we're trying to model here, which is a piece of the Gramacy and Lee function, we see that by having this hierarchical structure for our GP, the fit improves from what we had before.
-- As some of you might already know, defining a hierarchical structure for your Bayesian model, by placing priors on parameters that define the priors for other variables, is something that PyMC3 in general allows us to do quite easily, and it is actually what attracts me the most to the library.
+- As some of you might already know, defining a hierarchical structure for your Bayesian model, by placing priors on parameters that define the priors for other variables, is something that PyMC3 in general allows us to do quite easily, and it is actually what attracts me the most to the library, and I suspect the same goes for many others.
 
-### Slide 15:
+### Slide 15: Bayesian inference on machine learning parameters
+- Okay so far we have talked about building Bayesian models on mathematical objects, either individual variables or functions, and perform inference on them.
+- These methods are not unique to machine learning, and in fact, I'm pretty sure the statisticians in the room are more familiar with them than I am.
+- What is unique to machine learning or ML, on the other hand, is the technique of placing priors on parameters of an ML model and then use Bayes' theorem to obtain the posterior distributions of these parameters.
+- These posteriors then induce a _posterior predictive distribution_ on the target variable that we'd like to perform predictions on, which gives us the same benefit of having a belief on the target as well as uncertainty quantification.
+- The classical example of this is Bayesian linear regression, which we will consider next.
+
+### Slide 16: Linear regression
+- As a refresher, in a linear regression problem, we have a set of features or predictors and a target variable, and we assume there's a linear relationship between them.
+- We also have some observations on these features, which we denote matrix $\textbf{X}$, and the corresponding target variable, vector $\textbf{y}$.
+- We can encode our assumption using this equation, where $\textbf{w}$ is a vector of random coefficient or weight variables and $\varepsilon$ is the residual or noise.
+- Our goal is to find the value for $\textbf{w}$ that will result in a good fit for our linear assumption.
+- The exact definition of a good fit is up for interpretation, but the simplest way to solve this problem is to find $\textbf{w}$ such that the sum of squares of the residuals is minimized.
+- This method is called least squares and if we were to do a bit of algebra, the optimal solution for $\textbf{w}$ can actually be found.
+- With the optimized $\textbf{w}$, what we have in the end is a hyperplane that roughly goes through the points corresponding to our training data.
+- In the 2D case where we have one feature, this becomes the so-called best-fit line that many of us are familiar with.
+
+### Slide 17: Bayesian linear regression
+- So how would we solve the same linear regression problem the Bayesian way?
+- I mentioned that $\textbf{X}$ is considered to be a vector of random variables, so the first thing that comes to mind is to place a prior on this object.
+- The most common way to do this is to say $\textbf{X}$ follows a multivariate normal distribution, so each of the coefficients in $\textbf{X}$ has a normal prior.
+- We also assume $\varepsilon$ is Gaussian noise with unknown standard deviation $\sigma$.
+- This $\sigma$, which is a positive random variable, can also have its own prior; for now I will use an _Inverse Gamma_ distribution.
+- So with all of these priors set up, we can compute the likelihood of our observations $\textbf{y}$ using our linear assumption, and from there use Bayes' theorem to compute the posterior for each of our variables $\textbf{w}$ and $\sigma$.
+- Again, what we will have in the end is a posterior belief for each variable, which together induce a posterior predictive distribution for $\textbf{y}$.
+- This, as we mentioned before, helps us do point estimation if we'd like to exact out just a single value for $\textbf{w}$.
+
+### Slide 18: Credible interval in linear regression
+- More importantly, we can quantify the uncertainty that we have for our target variable $\textbf{y}$ that we're predicting on.
+- For example, still using the 2D toy example, we can plot out the credible interval for $\textbf{y}$, which somewhat looks like what we have with a GP, but here our belief about $\textbf{y}$ is constraint to be linear with respect to $\textbf{X}$, so our credible interval looks a bit different.
+- However, the benefits we obtain are still the same: for each point that we're predicting on, we can take naturally extract out a belief as a probability distribution about $y$.
+- Here we can compute the mean or the mode for $y$ and that will give us the same output as the least squares method in many cases, but we also can say how much uncertainty we have about this output.
+- For example, over here where our credible interval is small, we can say that we're fairly certain about our output guess, but more uncertainty exists in other areas where we don't have many data points.
+- Again, I want to make a point about how what we have here is objectively better than the output from the least squares method, which again highlights the benefit of a Bayesian framework.
+- A last note I want to include about this topic is that the procedure extends beyond linear regression and to polynomial regression and other models.
+- As long as we have a defined relationship between our features $\textbf{X}$ and our target $\textbf{y}$, a we can place a prior on the parameters that we have and establish a likelihood for our observations, and everything else can follow.
+
+### Slide 19: Bayesian neural networks
+- An example of this is in neural networks.
+- Some of you might be familiar with this machine learning model, but in a classic neural net, we have a graphical structure that consists of many layers of nodes.
+- Inside each node, the linear relationship we just talked about is applied to the input of the node and the output $\textbf{y}$ is put through a non-linear transformation.
+- The final output of the network is what's used to perform predictions.
+- The collection of these weights $\textbf{w}$ in all of the nodes is the parameters of the neural net that are optimized during training.
+- So, if we were to apply the same Bayesian framework to this neural net model, we could simply again place a joint prior on all of these weights and perform Bayesian inference to obtain first the posteriors for the weights and second the posterior predictive for the final output.
+- And this will give us the exact same benefit that we've been talking about: an updated belief about the output variable that defines not only the most likely value but also the uncertainty in that value.
+- The case of Bayesian neural nets is a bit more special, however, since maintain and updating our belief about the collection of network weights, which is typically very large, is infeasible using simple sampling strategies, so we would need to use variational inference, which is quite well implemented in PyMC3.
+- On this topic, Thomas Wiecki, one of the organizers of this conference, has a great talk at PyData, which I'm linking here so you could check it out yourself.
+
+### Slide 19: Bayesian neural networks: an illustration
+- I will end this topic and stealing one of his visualizations in that talk to really highlight the power of this method.
+- Here the problem is the classify these points into two groups as colored here.
+- A vanilla neural net could do this quite well, but when applying this method, we also have access to the _variance_ of the posterior predictive of the output, which is shown here.
+- The variance is large in the boundary area, which makes intuitive sense since classification is typically harder in the edge cases.
+- This helps us avoid unintuitively confident predictions that neural networks have been known to make.
+- Here's a classic example in adversarial machine learning, where by introducing some random noise to pictures, researchers found that neural nets can get confused in the worst way possible: it's wrong, but it's very confident that it's right.
+- With the natural ability to quantify uncertainty, the Bayesian method is one of the best candidates to combat this problem.
+
+### Slide 20: The multi-armed bandit problem
+- And that's the end of what I wanted to talk about regarding Bayesian modeling, specifically making Bayesian-informed predictions.
+- Now we will transition to Bayesian decision theory, where we consider the process of making Bayesian-informed decisions.
+- We will start with one of the canonical problems in the Bayesian decision theory literature: the multi-armed bandit problem.
+- The setting we have is the following:
+- We have $k$ slot machines $1, 2, ..., k$, each of which spits out a coin with probability $\theta_i$ when its arm is pulled.
+- We only have a limited number of pulls $N$ available to us.
+- Our goal is to sequentially pull the arms of these machines so that our expected number of coins, which is typically called the reward, is maximized when we run out of pulls.
+- The difficulty of the problem lies in the randomness of the reward returned by each machine.
+- Say at a given point, we have identified a machine that returns a coin half of the time that it is pulled, and it's the best return rate out of the machines we have pulled.
+- But there are also machines that we haven't pulled, or have only pulled once or twice, so we don't even know what their true return rate is roughly equal to.
+- This is generally called the trade-off between exploration and exploitation that is inherent in many decision-making problems in machine learning.
+- A solution to the multi-armed bandit problem is a way, or we will call a policy, of deciding which arm we should pull so that our chances of identifying the true best machine as quickly as possible is maximized.
+- Now, there are some naive policies we can immediately think of:
+- A greedy policy will always choose the arm of the machine with the highest observed return rate so far at the risk of not exploring enough and failing to identify the true best machine.
+- A purely explorative policy will choose a random arm every time, so its expected performance is simply the average return rate across all machines, which is not great.
+- The question is, can we come up with a principle way of choosing an arm to pull at each iteration to balance between exploration and exploitation?
+- Many real-world problems can be posed as multi-armed bandit, such as designing clinical trials where we'd like to investigate the effect of a drug while minimizing adverse effects on patients, or personalized recommendations where we want to suggest customized products to a customer.
+
+### Slide 21: Bayesian modeling of the return rates
+- Now, one way we could immediately apply a Bayesian framework to this problem is to model the return rate of each machine and its outcome in the same manner as our Chrome vs. Firefox example.
+- Specifically, we place a prior, for example uniform, on each $\theta_i$, so the outcome of each machine, whether the machine will return a coin if pulled, follows a Bernoulli distribution with unknown parameter $\theta_i$.
+- Now, at each iteration, we can obtain a posterior predictive distribution for this outcome with respect to every machine, and from there have a way to quantify out uncertainty about them.
+- That still leaves open the question of how to design a policy to pick one arm to pull at each iteration.
+- A good policy should prioritize arms that have high expected return rate and/or high variance in the posterior prediction distribution of the outcome, corresponding to exploitation and exploration respectively.
+
+### Slide 22: The Bayesian optimal policy
+- One potential solution is to design the Bayesian optimal policy, which basically chooses the arm that in expectation will result in maximum current plus future reward.
+- For example, if we only have one pull left, the Bayesian optimal decision is to greedily pick the arm with the best return rate.
+- However, if there are two or more pulls left, the value of pulling an arm depends on not only the immediately expected reward from that arm, but also the expected impact it will have on our future beliefs and decisions, conditioned on the outcome of that arm.
+- Overall, computing the Bayesian optimal decision is intractable when the number of pulls remaining is greater than 2.
+- So we need some other policies that approximate this optimal policy.
+- Here we will discuss two of the most popular policies for this multi-armed bandit problem: UCB and Thompson Sampling.
+
+### Slide 23: The Upper-Confidence Bound policy
+- There are many versions of the Upper-Confidence Bound, or UCB, policy, but in one Bayesian variant, we assign a point to each arm using this formula, which is a credible interval upper bound of the posterior predictive distribution of the outcome variable.
+- At each iteration, the arm with the highest score will be pulled.
+- We see that this policy naturally balances exploration and exploitation by using this upper credible interval bound, since if an arm has a high empirical return rate, then the whole posterior predictive credible interval will take on high values.
+- On the other hand, an arm that has not been pulled many times will have a fairly flat corresponding posterior predictive belief for the outcome, and the upper bound of the credible interval will also have a high value.
+- So by using the scoring rule, we will sequentially explore the set of available machines and converge on one that gives out the best reward.
+- And that is the idea behind UCB.
+
+### Slide 24: The Thompson Sampling policy
+- The second policy we will take a look at is called Thompson Sampling.
+- Unlike 
