@@ -205,7 +205,7 @@
 - So, if we were to apply the same Bayesian framework to this neural net model, we could simply again place a joint prior on all of these weights and perform Bayesian inference to obtain first the posteriors for the weights and second the posterior predictive for the final output.
 - And this will give us the exact same benefit that we've been talking about: an updated belief about the output variable that defines not only the most likely value but also the uncertainty in that value.
 - The case of Bayesian neural nets is a bit more special, however, since maintain and updating our belief about the collection of network weights, which is typically very large, is infeasible using simple sampling strategies, so we would need to use variational inference, which is quite well implemented in PyMC3.
-- On this topic, Thomas Wiecki, one of the organizers of this conference, has a great talk at PyData, which I'm linking here so you could check it out yourself.
+- On this topic, Thomas Wiecki, one of the PyMC devs and organizers of this conference, has a great talk at PyData, which I'm linking here so you could check it out yourself.
 
 ### Slide 19: Bayesian neural networks: an illustration
 - I will end this topic and stealing one of his visualizations in that talk to really highlight the power of this method.
@@ -255,9 +255,91 @@
 - At each iteration, the arm with the highest score will be pulled.
 - We see that this policy naturally balances exploration and exploitation by using this upper credible interval bound, since if an arm has a high empirical return rate, then the whole posterior predictive credible interval will take on high values.
 - On the other hand, an arm that has not been pulled many times will have a fairly flat corresponding posterior predictive belief for the outcome, and the upper bound of the credible interval will also have a high value.
+- Of course, if an arm is obviously not optimal, its posterior distribution will take on low values and its UCB score will be low, de-prioritizing it from being chosen.
 - So by using the scoring rule, we will sequentially explore the set of available machines and converge on one that gives out the best reward.
 - And that is the idea behind UCB.
 
 ### Slide 24: The Thompson Sampling policy
 - The second policy we will take a look at is called Thompson Sampling.
-- Unlike 
+- Unlike UCB where the procedure of choosing the next arm to pull is deterministic, Thompson Sampling is a randomized policy, meaning that when faced with the same information, it is not guaranteed that the policy will make the same choice every time.
+- Again, at each iteration, we maintain a posterior belief about each $\theta_i$ using a probability distribution.
+- Thompson Sampling tells us to then sample from these posteriors, which will give us a rough estimate for each $\theta_i$, denoted $\overline{\theta_i}$.
+- Then, we simply choose the arm corresponding to the largest estimate $\overline{\theta_i}$, and that will be our decision for that iteration.
+- As you can see, this procedure is randomized, as the sampling step is inherent not deterministic.
+- The intuition behind Thompson Sampling is quite simple but also elegant:
+- If we are very certain in our belief about a specific $\theta_i$ being the max return rate, then its posterior distribution is very concentrated around a relatively large number, which means a sample from this distribution will be very likely to be close to that large number as well, thus making arm $i$ more likely to be chosen.
+- On the other hand, if we are very uncertain about $\theta_i$, its posterior distribution is more widespread, and it will also be likely that a sample from this distribution is a large value, again causing arm $i$ more likely to be chosen.
+- So this sampling and choosing the largest procedure naturally favors posteriors that either are concentrated around a large value, in other words exploitation, or have more uncertainty and are widespread, or exploration.
+
+**If need more content**: However, there was a recent surge in interest in the policy among the ML community, and it was actually shown that Thompson Sampling --> theoretical bound
+
+- Sid Ravinutala, another organizer of this conference, recently published a great blogpost on Thompson Sampling in the context of Covid testing, which I'm linking here and highly recommend you check it out.
+
+### Slide 25: Bayesian optimization
+- Okay, so that's the problem of multi-armed bandit and the two most common solutions to it.
+- Now I want to move on to a somewhat related topic called Bayesian optimization.
+- In general, the term _Bayesian optimization_ denotes not a specific algorithm but a Bayesian-powered framework of decision-making for optimization problems.
+- The setup for such a problem is simple.
+- We have access to the output of a function via queries but not its gradients or its functional form, and sometimes the function we want to optimize doesn't even have a functional form, so all the gradient-based optimization routines are not applicable.
+- Moreover, querying this function is expensive, be it monetarily cost or time-consuming or other definitions of cost, so the number of queries we can make to the function is very limited.
+- The go-to example to motivate this problem is hyper-parameter tuning of neural network models.
+- Most of the time, we want to set these hyper-parameters so that the predictive performance of the model increases.
+- This could be accuracy, area under the curve, or some other metrics, but it is almost impossible to tell the functional form of these metrics in terms of the hyper-parameters, or if one even exists.
+- What's more, rerunning the whole neural net with a new set of hyper-parameter values to evaluate the performance can be quite time-consuming, since neural nets can take a long time to train.
+- The question laid out before us is that, how can we design an optimization policy of sequentially making queries to the objective function so that the maximizer of the function is identified when our queries run out.
+
+### Slide 26: Bayesian modeling of the objective function
+- Recall that in the multi-armed bandit problem, we model our belief about the return rate $\theta_i$ of each machine using the Bayesian framework.
+- The same can be done in this problem as well, but here we don't have individual latent variables $\theta_i$ that we need to worry about.
+- Instead, we have an entire function that we'd like to model and update our belief with new observations.
+- As you can already guess, this is where Gaussian processes come in.
+- As we discussed, a GP prior can be placed on a function to help us model our belief about the value of the function at each point in the domain.
+- Additionally, this gets updated with new observations to reflect our posterior belief about the function at unobserved points.
+- Now, our task is again to use this probabilistic belief about the function, modeled via a GP, and make informed decisions as to where to query the function, so that when our budget is depleted, we can identify the maximizer of the function.
+
+### Slide 27: Bayesian optimization vs. Multi-armed bandit
+- So far, you might have noticed that there is a parallel between Bayesian optimization and multi-armed bandit.
+- In both problems, we are faced with a decision of choosing where to evaluate next, either of an objective function or among a set of machine arms to pull.
+- In multi-armed bandit, we model individual return rates using the Bayesian framework, while in Bayesian optimization, we use a GP as the equivalent for a function.
+- In multi-armed bandit, the Bayesian optimal decision is intractable except when we only have one or two iterations left.
+- In Bayesian optimization, it's quite easy to see that the optimal decision is intractable except for the very last one.
+- If we have more than one query left, we would need to iterate through all possible queries, which are infinitely many in a function, but also condition each possible outcome of each query to look ahead.
+- Therefore, in Bayesian optimization, we also need to design policy that approximates the Bayesian optimal one.
+
+### Slide 28: Bayesian optimization policies: using the posterior belief
+- At each iteration, we have the posterior predictive distribution of the function value of each point in the domain.
+- This object gives rise to some of the most common Bayesian optimization policies.
+- For example, the _Probability of Improvement_ policy calculates the probability that the function value of each point is greater than the current maximum function value that we have observed.
+- This requires us to compute the CDF of a normal distribution among points in the domain, which is quite easy to do.
+- The _Expected Improvement_ policy, on the other hand, calculates its score as the expected improvement from the current maximum function value that we observed and chooses the point with the largest score.
+- The posterior predictive distribution also allows us to use the GP equivalent of the UCB policy, which computes the credible interval upper bound of each unobserved point in the domain and chooses the maximizer.
+- We see that similar to what we have seen, all of these policies again balances the trade-off between exploration and exploitation by prioritizing points with large expected value or large uncertainty in its posterior distribution.
+
+### Slide 29: Bayesian optimization policies: distribution of the true maximizer
+- Given the posterior predictive distribution of the objective function, we can consider the distribution of the location of the true maximizer of the function, $x^*$.
+- This object motivates several other optimization policies that seek to minimize the uncertainty about $x^*$ with their queries such as _Entropy Search_ and _Predictive Entropy Search_.
+- If this idea sounds strange to you, a minimal equivalent case is binary search of a sorted array.
+- By querying the number in the middle of the current sub-array at each iteration, we effectively minimize our uncertainty about where the number we are looking for is.
+- _Entropy Search_ and _Predictive Entropy Search_ work roughly in a similar way, but the target of the search is the location of the function maximizer.
+- Interestingly, Thompson Sampling has its own analog in the Bayesian optimization problem, where we first assign each unobserved point a score equal to the probability that the true function maximizer is at that point.
+- Then, we randomly sample the points with probabilities proportional to these scores and query at the point we sampled.
+- Again, these policies are motivated by finding the location of $x^*$, powered by the GP belief that we maintain on the objective function, which is quite a unique technique that is only possible within a Bayesian framework.
+- This is also the end of what I wanted to cover regarding Bayesian optimization.
+
+### Slide 30: Other Bayesian decision-making problems in ML
+- Now, I want to briefly go over some other, more exotic, problems in machine learning where Bayesian decision theory thrives.
+- First, we have the subfield called active learning, where the general problem is to identify minimal training data that will give a given ML model the best predictive performance.
+- If you are familiar with _Support Vector Machine_ classifiers, you might remember that if the training data is reduced to just the support vectors, the data points that are on the classification boundary, the resulting trained model will not change.
+- The idea is then generalized in active learning, where we want to identify the smallest set of data points to train our models on without sacrificing any predictive performance.
+- Typically this is used when obtaining the label of a data point is costly in the same way as Bayesian optimization: it is either expensive, time-consuming, or undesirable to do many times in some other way.
+- Related is the active search problem, where we still have a constraint on the number of queries we can make, but the goal is to identify as many members of a rare class as possible.
+- In other words, this is an active learning problem where we'd like to maximize recall.
+- The ability to actively search for and make queries that are optimal in expectation with respect to a specific goal comes straight from our belief about our environment, represented as probability distributions and worked out using Bayesian decision theory.
+- Results of hese subfields of ML can lead to cheaper and more efficient ML training in applications where, again, labeling is costly and uncertainty plays an important role such as clinical trials, fraud detection, or scientific experiments.
+
+### Slide 31: Conclusion
+- That also concludes my talk on Bayesian methods in machine learning.
+- Overall, we have discussed two specific topics: Bayesian modeling and Bayesian decision theory in the context of ML.
+- I hope I have convinced you that going from Bayes' theorem, we can design Bayesian frameworks to address problems in ML in a more informed, principled way.
+- A second point that I wanted to make is PyMC3's ability to allow fast, easy building of probabilistic models, especially ones with hierarchical structures.
+- In the code repository of this talk, I also included some 
