@@ -10,14 +10,13 @@
 - This is so that we can maximize the likelihood that a person finds a specific topic in this talk interesting.
 - That said, I will be including references to more in-depth readings throughout so that you can navigate materials available online on what you're interested in better.
 - With that out of the way, let's get started.
-
-### Slide 2: Agenda
 - So in this talk, we will be specifically focusing on two main topics: Bayesian modeling and Bayesian decision making.
 - Both are essential to Bayesian machine learning as well as any Bayes-centric decision-making system.
 - The first topic goes through some of the most common choices in terms of modeling a latent variable, which includes making inferences,
 - If you are new to Bayesian statistics and inference, this discussion will help get you up to speed with the main ideas in this broad field.
 - Otherwise, if you are already familiar with the topic, the first part of the video can still give you a quick refresher, or you can skip to the second part about decision-making.
 
+<!--
 ### Slide 3: Intro to Bayes
 - Most of you might are tired of seeing this picture, but I'll be remiss if I don't include this obligatory Bayes' theorem neon sign.
 - All things Bayesian-related start with this formula, which calculates the conditional probability of event A happening, given that event B happens.
@@ -35,8 +34,9 @@
 - While as Bayesians, we treat the latent quantity about what we care about as a random variable, which can take on values as defined by the set of our hypotheses.
 - You can make the argument, and in fact many do, that thinking about posterior probability is more natural than thinking about the likelihood, as the latent variable is what we are unsure of, as opposed to the data, which we can observe.
 - Not only a more natural way to think about uncertainty, a Bayesian framework can also help address many problems in machine learning, as we will see in this talk.
-- And with that, let's move on to our first topic: Bayesian modeling.
+-->
 
+- And with that, let's move on to our first topic: Bayesian modeling.
 
 ### Slide 5: A starting example
 - We will start with a simple problem: estimating the proportion that prefers Google Chrome as a web browser to Firefox, out of the entire population of Internet users.
@@ -62,7 +62,7 @@
 - For now, we will move on with our current problem of inferring $\theta$.
 
 ### Slide 7: Making inferences: the likelihood
-- Again, in addition to the prior, we also need the likelihood function to denote the probability of the observed data given a specific hypothesis.
+- In addition to the prior, we also need the likelihood function to denote the probability of the observed data given a specific hypothesis.
 - Here we need the function computing the probability of $\mathcal{D}$ given a specific value of $\theta$.
 - This we can calculate fairly easily: if the true proportion of people preferring Chrome is $\theta$, then each person in our sample has $\theta$ probability of preferring Chrome.
 - Moreover, each person's preference does not affect another's; in other words, each of the numbers is $\mathcal{D}$ is independent from one another.
@@ -216,9 +216,51 @@
 - Here's a classic example in adversarial machine learning, where by introducing some random noise to pictures, researchers found that neural nets can get confused in the worst way possible: it's wrong, but it's very confident that it's right.
 - With the natural ability to quantify uncertainty, the Bayesian method is one of the best candidates to combat this problem.
 
-### Slide 20: The multi-armed bandit problem
+### Slide 20: Bayesian decision theory
 - And that's the end of what I wanted to talk about regarding Bayesian modeling, specifically making Bayesian-informed predictions.
 - Now we will transition to Bayesian decision theory, where we consider the process of making Bayesian-informed decisions.
+- As we will see throughout this section, Bayesian decision theory consists of two main components: maintaining Bayesian beliefs about unknown quantities, which we just talked about, and using those beliefs to maximize the utility function.
+- The term _utility function_ denotes our valuation for different outcomes of an unknown event.
+- It basically maps a given state of the world, which is random, to a specific numerical value, thus giving us a way to compare and express preference over the different outcomes.
+- The concept is unique to each problem and sometimes even to each statistician, but as long as we have a well-defined utility function, we will be able to say things about the Bayesian optimal decision, which is the decision that will in expectation lead to the best outcome, according to the current state of the world and utility function.
+- To become more familiar with the idea of using the utility function, we will go through a quick toy problem, where we derive the best strategy for _The Price is Right_.
+
+### Slide 21: Bayesian optimal The Price is Right
+- Our setup is a modified version of _The Price is Right_ as follows.
+- We are competing against another player in a game where we have to guess the price $P$ of a product with a single number.
+- Our opponent has already made her guess to be $\overline{p}$.
+- Now, if our guess is above the actual price then we won't get anything, in which case our utility is 0. The same goes for our opponent.
+- If neither of the guesses are above the actual price, the person with the closest guess will win the product.
+- In other words, if we win, our utility will be the actual value of $P$, otherwise it will  be 0.
+- Say we do have a belief about $p$, expressed as a normal probability distribution $\mathcal{N}(p; \mu, \sigma^2)$.
+- Our task is to also make the Bayesian optimal guess, which is the guess that has the highest expected utility.
+
+### Slide 22: Deriving the optimal decision
+- Now, the technique to derive the optimal decision, in this case the optimal guess, in a Bayesian framework remains relatively the same across problems.
+- We first consider the utility of each action given the actual price, and then marginalize out that price according to our belief.
+- Specifically, our utility is 0 if our guess $g$ is greater than $P$, regardless of what our opponent's guess is.
+- In other words, $u(g \mid P) = 0$ if $g > P$.
+- $u(g \mid P) = 0$ if $g < \overline{p} < P$.
+- Otherwise, $u(g \mid P) = P$ if $\overline{p} < g < P$.
+- Then, for each value of $g$, we compute the expected utility as $\mathbb{E}[u(g)] = \int u(g \mid P) dP$.
+- This can be approximated by drawing samples from our predictive belief about $P$ and computing $u$ with the rules that we have.
+- Finally, we choose our guess $g$ to maximize this expected utility: $g^* = \arg \max_g \mathbb{E}(u(g))$.
+
+### Slide 23: Visualizing the Bayesian optimal decision
+- So that is the general process of deriving the Bayesian optimal decision.
+- Using the same procedure, we could write a function that takes in values sampled from the predictive distribution to represent our belief and plot out the expected utility as a function of our guess.
+- Let's say for our specific example, we have a predictive belief about $P$ as a gaussian with mean $100 and standard deviation 10, and our opponent has guesses at 75.
+- Here I'm showing that plot that denotes the expected utility for potential guesses.
+- We see that everything below 75 has an expected utility of 0, since no matter what the actual price is, our guess will always be lower than our opponent's, and we won't win.
+- To obtain the Bayesian optimal decision, we simply locate the maximum of the plot and get the corresponding guess.
+- In this case, it is a number just above 75.
+- This makes sense since we only need to make sure that our guess is above our opponent's guess, so there's no value in going too far away from 75 and risking going above the actual price.
+- This is why the expected utility quickly drops to 0 after that point.
+- Of course, here our opponent is at a total disadvantage since she has to guess first, so the format of the actual show is not this simplified version.
+- But overall, I hope that via this example, we can understand the concept of the Bayesian optimal decision and how to derive it better.
+- From forward, we will start talking about actual problems in machine learning that can greatly benefit from a Bayesian perspective.
+
+### Slide 24: The multi-armed bandit problem
 - We will start with one of the canonical problems in the Bayesian decision theory literature: the multi-armed bandit problem.
 - The setting we have is the following:
 - We have $k$ slot machines $1, 2, ..., k$, each of which spits out a coin with probability $\theta_i$ when its arm is pulled.
@@ -342,4 +384,4 @@
 - Overall, we have discussed two specific topics: Bayesian modeling and Bayesian decision theory in the context of ML.
 - I hope I have convinced you that going from Bayes' theorem, we can design Bayesian frameworks to address problems in ML in a more informed, principled way.
 - A second point that I wanted to make is PyMC3's ability to allow fast, easy building of probabilistic models, especially ones with hierarchical structures.
-- In the code repository of this talk, I also included some 
+- In the code repository of this talk, I also included some
