@@ -158,8 +158,6 @@
 - Specifically, using PyMC3, I place a Gamma prior on $\ell$ and a Half Cauchy prior on $\eta$ for our running exmaple; this results in the posterior GP here.
 - Now, as I show the true latent function that we're trying to model here, which is a piece of the Gramacy and Lee function, we see that by having this hierarchical structure for our GP, the fit improves from what we had before.
 - As some of you might already know, defining a hierarchical structure for your Bayesian model, by placing priors on parameters that define the priors for other variables, is something that PyMC3 in general allows us to do quite easily, and it is actually what attracts me the most to the library, and I suspect the same goes for many others.
-
-### Slide 15: Bayesian inference on machine learning parameters
 - Okay so far we have talked about building Bayesian models on mathematical objects, either individual variables or functions, and perform inference on them.
 - These methods are not unique to machine learning, and in fact, I'm pretty sure the statisticians in the room are more familiar with them than I am.
 - What is unique to machine learning or ML, on the other hand, is the technique of placing priors on parameters of an ML model and then use Bayes' theorem to obtain the posterior distributions of these parameters.
