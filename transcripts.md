@@ -189,7 +189,6 @@
 - For example, still using the 2D toy example, we can plot out the credible interval for $\textbf{y}$, which somewhat looks like what we have with a GP, but here our belief about $\textbf{y}$ is constraint to be linear with respect to $\textbf{X}$, so our credible interval looks a bit different.
 - However, the benefits we obtain are still the same: for each point that we're predicting on, we can take naturally extract out a belief as a probability distribution about $y$.
 - Here we can compute the mean or the mode for $y$ and that will give us the same output as the least squares method in many cases, but we also can say how much uncertainty we have about this output.
-- For example, over here where our credible interval is small, we can say that we're fairly certain about our output guess, but more uncertainty exists in other areas where we don't have many data points.
 - Again, I want to make a point about how what we have here is objectively better than the output from the least squares method, which again highlights the benefit of a Bayesian framework.
 - A last note I want to include about this topic is that the procedure extends beyond linear regression and to polynomial regression and other models.
 - As long as we have a defined relationship between our features $\textbf{X}$ and our target $\textbf{y}$, a we can place a prior on the parameters that we have and establish a likelihood for our observations, and everything else can follow.
