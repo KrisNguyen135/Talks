@@ -76,9 +76,6 @@
 - We can compute the numerator easily, as we already have access to both the prior and the likelihood.
 - The question remains: how to compute the denominator in this question?
 - First, we see that using the sum rule, we can rewrite the denominator as the sum of the numerator for all values of $\theta$.
-
-**If need more content**: conjugacy
-
 - Still, computing the integral is often intractable except for a very specific set of cases.
 - This is where we turn to sampling techniques to approximate the quantity.
 - Specifically, say we draw samples from the prior distribution
@@ -199,27 +196,18 @@
 - Inside each node, the linear relationship we just talked about is applied to the input of the node and the output $\textbf{y}$ is put through a non-linear transformation.
 - The final output of the network is what's used to perform predictions.
 - The collection of these weights $\textbf{w}$ in all of the nodes is the parameters of the neural net that are optimized during training.
-- So, if we were to apply the same Bayesian framework to this neural net model, we could simply again place a joint prior on all of these weights and perform Bayesian inference to obtain first the posteriors for the weights and second the posterior predictive for the final output.
+- So, if we were to apply the same Bayesian framework to this neural net model, we could simply again place a prior on all of these weights and perform Bayesian inference to obtain first the posteriors for the weights and second the posterior predictive for the final output.
 - And this will give us the exact same benefit that we've been talking about: an updated belief about the output variable that defines not only the most likely value but also the uncertainty in that value.
-- The case of Bayesian neural nets is a bit more special, however, since maintain and updating our belief about the collection of network weights, which is typically very large, is infeasible using simple sampling strategies, so we would need to use variational inference, which is quite well implemented in PyMC3.
+- The case of Bayesian neural nets is a bit more special, however, since maintain and updating our belief about the collection of network weights, which is typically extremely large, is infeasible using simple sampling strategies, so we would need to use variational inference, which is quite well implemented in PyMC3.
 - On this topic, Thomas Wiecki, one of the PyMC devs and organizers of this conference, has a great talk at PyData, which I'm linking here so you could check it out yourself.
-
-### Slide 19: Bayesian neural networks: an illustration
-- I will end this topic and stealing one of his visualizations in that talk to really highlight the power of this method.
-- Here the problem is the classify these points into two groups as colored here.
-- A vanilla neural net could do this quite well, but when applying this method, we also have access to the _variance_ of the posterior predictive of the output, which is shown here.
-- The variance is large in the boundary area, which makes intuitive sense since classification is typically harder in the edge cases.
-- This helps us avoid unintuitively confident predictions that neural networks have been known to make.
-- Here's a classic example in adversarial machine learning, where by introducing some random noise to pictures, researchers found that neural nets can get confused in the worst way possible: it's wrong, but it's very confident that it's right.
-- With the natural ability to quantify uncertainty, the Bayesian method is one of the best candidates to combat this problem.
 
 ### Slide 20: Bayesian decision theory
 - And that's the end of what I wanted to talk about regarding Bayesian modeling, specifically making Bayesian-informed predictions.
 - Now we will transition to Bayesian decision theory, where we consider the process of making Bayesian-informed decisions.
 - As we will see throughout this section, Bayesian decision theory consists of two main components: maintaining Bayesian beliefs about unknown quantities, which we just talked about, and using those beliefs to maximize the utility function.
 - The term _utility function_ denotes our valuation for different outcomes of an unknown event.
-- It basically maps a given state of the world, which is random, to a specific numerical value, thus giving us a way to compare and express preference over the different outcomes.
-- The concept is unique to each problem and sometimes even to each statistician, but as long as we have a well-defined utility function, we will be able to say things about the Bayesian optimal decision, which is the decision that will in expectation lead to the best outcome, according to the current state of the world and utility function.
+- The function $u$ basically maps a decision leading to an outcome, which is random, to a specific numerical value, thus giving us a way to compare and express preference over the different decisions and outcomes.
+- The concept is unique to each problem and sometimes even to each statistician, but as long as we have a well-defined utility function, we will be able to say things about the Bayesian optimal decision $d^*$, which is the decision that will in expectation lead to the best outcome, according to the current state of the world and utility function.
 - To become more familiar with the idea of using the utility function, we will go through a quick toy problem, where we derive the best strategy for _The Price is Right_.
 
 ### Slide 21: Bayesian optimal The Price is Right
@@ -237,7 +225,7 @@
 - We first consider the utility of each action given the actual price, and then marginalize out that price according to our belief.
 - Specifically, our utility is 0 if our guess $g$ is greater than $P$, regardless of what our opponent's guess is.
 - In other words, $u(g \mid P) = 0$ if $g > P$.
-- $u(g \mid P) = 0$ if $g < \overline{p} < P$.
+- If $g < \overline{p} < P$, then our utility is also 0.
 - Otherwise, $u(g \mid P) = P$ if $\overline{p} < g < P$.
 - Then, for each value of $g$, we compute the expected utility as $\mathbb{E}[u(g)] = \int u(g \mid P) dP$.
 - This can be approximated by drawing samples from our predictive belief about $P$ and computing $u$ with the rules that we have.
@@ -272,10 +260,10 @@
 - A greedy policy will always choose the arm of the machine with the highest observed return rate so far at the risk of not exploring enough and failing to identify the true best machine.
 - A purely explorative policy will choose a random arm every time, so its expected performance is simply the average return rate across all machines, which is not great.
 - The question is, can we come up with a principle way of choosing an arm to pull at each iteration to balance between exploration and exploitation?
-- Many real-world problems can be posed as multi-armed bandit, such as designing clinical trials where we'd like to investigate the effect of a drug while minimizing adverse effects on patients, or personalized recommendations where we want to suggest customized products to a customer.
+- Overall, many real-world problems can be posed as multi-armed bandit, such as designing clinical trials where we'd like to investigate the effect of a drug while minimizing adverse effects on patients, or personalized recommendations where we want to suggest customized products to a customer.
 
 ### Slide 21: Bayesian modeling of the return rates
-- Now, one way we could immediately apply a Bayesian framework to this problem is to model the return rate of each machine and its outcome in the same manner as our Chrome vs. Firefox example.
+- Now, one way we could immediately apply a Bayesian framework to this problem is to model the return rate of each machine and its outcome in the same manner as the classic coin flipping example.
 - Specifically, we place a prior, for example uniform, on each $\theta_i$, so the outcome of each machine, whether the machine will return a coin if pulled, follows a Bernoulli distribution with unknown parameter $\theta_i$.
 - Now, at each iteration, we can obtain a posterior predictive distribution for this outcome with respect to every machine, and from there have a way to quantify out uncertainty about them.
 - That still leaves open the question of how to design a policy to pick one arm to pull at each iteration.
@@ -287,6 +275,8 @@
 - However, if there are two or more pulls left, the value of pulling an arm depends on not only the immediately expected reward from that arm, but also the expected impact it will have on our future beliefs and decisions, conditioned on the outcome of that arm.
 - Overall, computing the Bayesian optimal decision is intractable when the number of pulls remaining is greater than 2.
 - So we need some other policies that approximate this optimal policy.
+- To quantify how good a policy is, we typically use the measure called regret, which is the difference in utility between a given policy and always pulling the optimal arm.
+- It has been proven that the best we could do is a regret that behaves like a logarithmic function of the number of iterations $t$, so our goal is to have policies that have regret of this behavior.
 - Here we will discuss two of the most popular policies for this multi-armed bandit problem: UCB and Thompson Sampling.
 
 ### Slide 23: The Upper-Confidence Bound policy
@@ -309,18 +299,17 @@
 - If we are very certain in our belief about a specific $\theta_i$ being the max return rate, then its posterior distribution is very concentrated around a relatively large number, which means a sample from this distribution will be very likely to be close to that large number as well, thus making arm $i$ more likely to be chosen.
 - On the other hand, if we are very uncertain about $\theta_i$, its posterior distribution is more widespread, and it will also be likely that a sample from this distribution is a large value, again causing arm $i$ more likely to be chosen.
 - So this sampling and choosing the largest procedure naturally favors posteriors that either are concentrated around a large value, in other words exploitation, or have more uncertainty and are widespread, or exploration.
-
-**If need more content**: However, there was a recent surge in interest in the policy among the ML community, and it was actually shown that Thompson Sampling --> theoretical bound
-
 - Sid Ravinutala, another organizer of this conference, recently published a great blogpost on Thompson Sampling in the context of Covid testing, which I'm linking here and highly recommend you check it out.
+- Okay, so that's the problem of multi-armed bandit and the two most common solutions to it.
+- Theoretically, we could actually prove that the expected regret resulting from applying either of these solutions does have a logarithmic trend, so it is a good guarantee to have when these policies are applied in real-life problems.
 
 ### Slide 25: Bayesian optimization
-- Okay, so that's the problem of multi-armed bandit and the two most common solutions to it.
 - Now I want to move on to a somewhat related topic called Bayesian optimization.
 - In general, the term _Bayesian optimization_ denotes not a specific algorithm but a Bayesian-powered framework of decision-making for optimization problems.
 - The setup for such a problem is simple.
 - We have access to the output of a function via queries but not its gradients or its functional form, and sometimes the function we want to optimize doesn't even have a functional form, so all the gradient-based optimization routines are not applicable.
 - Moreover, querying this function is expensive, be it monetarily cost or time-consuming or other definitions of cost, so the number of queries we can make to the function is very limited.
+- What's more, our observations might be noisy and not exactly the function values.
 - The go-to example to motivate this problem is hyper-parameter tuning of neural network models.
 - Most of the time, we want to set these hyper-parameters so that the predictive performance of the model increases.
 - This could be accuracy, area under the curve, or some other metrics, but it is almost impossible to tell the functional form of these metrics in terms of the hyper-parameters, or if one even exists.
@@ -345,16 +334,16 @@
 - If we have more than one query left, we would need to iterate through all possible queries, which are infinitely many in a function, but also condition each possible outcome of each query to look ahead.
 - Therefore, in Bayesian optimization, we also need to design policy that approximates the Bayesian optimal one.
 
-### Slide 28: Bayesian optimization policies: using the posterior belief
+### Slide 28: Using the posterior belief
 - At each iteration, we have the posterior predictive distribution of the function value of each point in the domain.
 - This object gives rise to some of the most common Bayesian optimization policies.
-- For example, the _Probability of Improvement_ policy calculates the probability that the function value of each point is greater than the current maximum function value that we have observed.
+- For example, the _Probability of Improvement_ policy calculates the probability that the function value of each point is greater than the current maximum function value that we have observed, $\overline{y}$.
 - This requires us to compute the CDF of a normal distribution among points in the domain, which is quite easy to do.
 - The _Expected Improvement_ policy, on the other hand, calculates its score as the expected improvement from the current maximum function value that we observed and chooses the point with the largest score.
 - The posterior predictive distribution also allows us to use the GP equivalent of the UCB policy, which computes the credible interval upper bound of each unobserved point in the domain and chooses the maximizer.
 - We see that similar to what we have seen, all of these policies again balances the trade-off between exploration and exploitation by prioritizing points with large expected value or large uncertainty in its posterior distribution.
 
-### Slide 29: Bayesian optimization policies: distribution of the true maximizer
+### Slide 29: Distribution of the true maximizer
 - Given the posterior predictive distribution of the objective function, we can consider the distribution of the location of the true maximizer of the function, $x^*$.
 - This object motivates several other optimization policies that seek to minimize the uncertainty about $x^*$ with their queries such as _Entropy Search_ and _Predictive Entropy Search_.
 - If this idea sounds strange to you, a minimal equivalent case is binary search of a sorted array.
