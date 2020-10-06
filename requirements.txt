@@ -1,7 +1,0 @@
-numpy
-scipy
-joblib
-scikit-learn
-pyMC3
-theano
-pyGPGO

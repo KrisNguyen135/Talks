@@ -2,23 +2,6 @@
 ## Transcripts
 
 ### Slide 1
-- Hello everyone, thanks for joining my talk, _Bayesian methods in machine learning: a brief introduction_.
-- My name is Quan, I'm a Ph.D. student in computer science at Washington University in St. Louis.
-- My research partially focuses on the topics discussed in this video so I'm very excited to go through it with you.
-- Overall, I'll be talking about ideas and techniques used in machine learning that are based on Bayes' theorem and Bayesian statistics.
-- The goal I have in mind is to cover quite a number of topics at a relatively superficial level, and the materials covered might not be as detailed as some of you had hoped.
-- This is so that we can maximize the likelihood that a person finds a specific topic in this talk interesting.
-- That said, I will be including references to more in-depth readings throughout so that you can find materials available online on what you're interested in better.
-- If you're interested in the code used to generate the plots in this talk, you can also check out the GitHub repo for this talk on my GitHub.
-- With that out of the way, let's get started.
-- We will be specifically focusing on two main topics: Bayesian modeling and Bayesian decision making.
-- Both are essential to Bayesian machine learning as well as any Bayes-centric decision-making system.
-- The first topic goes through some of the most common choices in terms of modeling a latent variable, including making inferences.
-- If you are new to Bayesian statistics and inference, this discussion will help get you up to speed with the main ideas in this field.
-- Otherwise, if you are already familiar with the topic, the first part of the video can still give you a quick refresher, or you can skip to the second part about decision-making.
-- And with that, let's move on to our first topic: Bayesian modeling.
-
-### Slide 2
 - We will start with the canonical problem in Bayesian interference: estimating the success rate of a binary event.
 - This event can be the face of a flipped coin, whether or not a new drug will have a positive effect on a specific patient, and so on.
 - We will call this rate, which is a real number between 0 and 1, $\theta$.
@@ -30,7 +13,7 @@
 - With the data from this sample, we would like to say something about this $\theta$, maybe what value it most likely takes, or between what range it is most likely in.
 - In other words, we would like to perform _inference_ on this random variable.
 
-### Slide 3
+### Slide 2
 - The first component in our Bayesian framework that we need is our prior belief about $\theta$, which is expressed as a probability distribution, defined across its possible values.
 - In our specific case, it is a distribution with support $[0, 1]$.
 - Now, the prior distribution, or prior belief, varies from person to person.
@@ -41,7 +24,7 @@
 - How to choose an appropriate prior is a deep problem in and of itself, and I believe there is a talk at this PyMCon on this very topic.
 - For now, we will move on with our current problem of inferring $\theta$.
 
-### Slide 4
+### Slide 3
 - In addition to the prior, we also need the likelihood function to denote the probability of the observed data given a specific hypothesis.
 - Here we need the function computing the probability of $\mathcal{D}$ given a specific value of $\theta$.
 - We assume first that there are $k$ successes and $(n - k)$ failures in our sample dataset.
@@ -51,7 +34,7 @@
 - If we treat the outcome of each test as a binary random variable, we say that the variable follows a Bernoulli distribution with parameter $\theta$.
 - We usually call this the predictive distribution, as it is the belief about the _outcome_ that we'd like to model.
 
-### Slide 5
+### Slide 4
 - So, we have our prior distribution and our likelihood function.
 - Now, we can apply Bayes' theorem to compute the probability of $\theta$ being a specific value, given our observed data as denoted here.
 - We can compute the numerator easily, as we already have access to both the prior and the likelihood.
@@ -70,7 +53,7 @@
 - This is a function with the domain between 0 and 1 denoting our posterior belief about the possible values of $\theta$.
 - And that is the complete Bayesian inference procedure for this specific example; let's now look at some visualizations.
 
-### Slide 6
+### Slide 5
 - Let's say the true, unknown value of $\theta$ is $0.3$, so 30 percent of the time, the event we're considering will result in a success.
 - Say our prior belief about $\theta$ is encoded by this blue line, so before seeing any data, we believe that $\theta$ is around 0.8.
 - Our sample data is this collection of 100 values, which I generated randomly using NumPy.
@@ -89,7 +72,7 @@
 - What if you instead want to model a function, which is in a sense a collection of infinite variables, each defined on a point?
 - Here we turn to Gaussian processes, which are a really convenient mathematical object that allows us to use Bayesian inference to model a function.
 
-### Slide 7
+### Slide 6
 - Gaussian processes, or GPs, have a special place in Bayesian machine learning, because they offer so much flexibility in modeling functions of various shapes and smoothness.
 - In the simplest sense, having a GP belief on a latent function first means we place a normal distribution prior on every point inside the domain of the latent function.
 - A GP consists of a mean function, which specifies the central tendency of the latent function, and a covariance matrix, which defines covariance of any pair of points within the domain.
@@ -99,7 +82,7 @@
 - Luckily for us, most Bayesian software, including PyMC, already takes care of this computation.
 - Overall, all we need to know is that after this conditioning, the posterior GP give us access to the posterior distribution of any point inside the domain of the function.
 
-### Slide 8
+### Slide 7
 - Let's now look at some examples so that we can have a visual understanding of what a GP can help us do.
 - Say we have an arbitrary function, defined on $[0, 1]$, and we'd like to model it using a GP, which I'm showing the PyMC3 code for here.
 - A constant or even zero mean function is typically used, while there are many more choices to be made regarding the covariance matrix, with the Matern 5 / 2 being one of the most commonly used, so those are our choices for this example as well.
@@ -110,7 +93,7 @@
 - This means if you consider any point $x$ here, its prior mean is 0, and its CI is between these two points.
 - For now, there's nothing interesting going on as we haven't observed any data yet.
 
-### Slide 9
+### Slide 8
 - Now, say we observe the value of the function at these specific points, as shown here.
 - After conditioning on these observations, we visualize the posterior GP again using the posterior mean and CI.
 - We see that the posterior mean nicely goes through the observation and the CI is squeezed in the regions around the observations.
@@ -119,7 +102,7 @@
 - If we take a vertical slice of this plot at any unobserved point $x$, we obtain our posterior belief about $x$.
 - And that is the general procedure of using a GP to model a function, or in other words, regression.
 
-### Slide 10
+### Slide 9
 - One note that I brushed over earlier is the choice of the covariance function parameters, which can be viewed as the hyper-parameters of our GP model.
 - Again, these hyper-parameters specify the smoothness of the GP and therefore hugely influence the behavior of the posterior.
 - For example, here are the posterior GPs when these hyper-parameters have different values.
@@ -129,7 +112,7 @@
 - It is at this point that PyMC sets itself apart from other Bayesian modeling tools using GP.
 - For example, if you were to use scikit-learn's otherwise excellent GP implementation `GaussianProcessRegressor`, you would either need to set the hyper-parameters beforehand or use an optimizer to find their values, which doesn't allow you to encode your preference/expertise via a prior in the optimization.
 
-### Slide 11
+### Slide 10
 - Specifically, using PyMC3, I place a Gamma prior on $\ell$ and a Half Cauchy prior on $\eta$ in our running example; this results in the posterior GP here.
 - Now, we see that by having this hierarchical structure for our GP, the fit improves from what we had before.
 - As some of you might already know, defining a hierarchical structure for your Bayesian model by placing priors on parameters that define other variables is something that PyMC3 in general allows us to do quite easily, and it is actually what attracts me the most to the library.
@@ -139,7 +122,7 @@
 - These posteriors then induce a _posterior predictive distribution_ on the target variable that we'd like to perform predictions on, which gives us the same benefit of having a belief on the target as well as uncertainty quantification.
 - The classical example of this is Bayesian linear regression, which we will consider next.
 
-### Slide 12
+### Slide 11
 - As a refresher, in a linear regression problem, we have a set of features or predictors $\textbf{x}$ and a target variable $y$, and we assume there's a linear relationship between them.
 - We can encode our assumption using this equation, where $\textbf{w}$ is a vector of random coefficients or weight variables and $\varepsilon$ is the residual or noise.
 - Our goal is to find the value for $\textbf{w}$ that will result in a good fit for our linear assumption.
@@ -157,7 +140,7 @@
 - This, as we mentioned before, helps us do point estimation if we'd like to exact out just a single value for $\textbf{w}$.
 - More importantly, we can quantify the uncertainty that we have for our target variable $\textbf{y}$ that we're predicting on.
 
-### Slide 13
+### Slide 12
 - For example, still using a 2D toy example, we can plot out the credible interval for $\textbf{y}$, which somewhat looks like what we have with a GP, but here our belief about $\textbf{y}$ is constraint to be linear with respect to $\textbf{x}$, so our credible interval looks a bit different.
 - However, the benefits are still the same: for each point that we're predicting on, we can naturally extract out a belief as a probability distribution about $y$.
 - Here we can compute the mean or the mode for $y$ and that will give us an output that is almost equal to the least squares method in many cases, but we also can say how much uncertainty we have about this output.
@@ -175,7 +158,7 @@
 - On this topic, Thomas Wiecki has a great talk at PyData, which I'm linking here so you could check it out yourself.
 - And that's the end of what I wanted to talk about regarding Bayesian modeling, specifically making Bayesian-informed predictions.
 
-### Slide 14
+### Slide 13
 - Now we will transition to Bayesian decision theory, where we consider the process of making Bayesian-informed decisions.
 - As we will see throughout this section, Bayesian decision theory consists of two main components: maintaining Bayesian beliefs about unknown quantities, which we just talked about, and using those beliefs to maximize the utility function.
 - The term _utility function_ denotes our valuation for different outcomes of an unknown event.
@@ -183,7 +166,7 @@
 - The concept is unique to each problem and sometimes even to each statistician, but as long as we have a well-defined utility function, we will be able to say things about the Bayesian optimal decision $d^*$, which is the decision that will in expectation lead to the best outcome, according to the current state of the world and utility function.
 - To become more familiar with the idea of using the utility function, we will go through a quick toy problem, where we derive the best strategy for _The Price is Right_.
 
-### Slide 15
+### Slide 14
 - Our setup is a modified version of _The Price is Right_ as follows.
 - We are competing against another player in a game where we have to guess the price $P$ of a product with a single number.
 - Our opponent has already made her guess to be $\overline{p}$.
@@ -193,7 +176,7 @@
 - Say we do have a belief about $p$, expressed as a normal probability distribution $\mathcal{N}(p; \mu, \sigma^2)$.
 - Our task is to also make the Bayesian optimal guess, which is the guess that has the highest expected utility.
 
-### Slide 16
+### Slide 15
 - Now, the technique to derive the optimal decision in a Bayesian framework is relatively the same across problems.
 - We first consider the utility of each action given the actual price, and then marginalize out that price according to our belief.
 - Specifically, our utility is 0 if our guess $g$ is greater than $P$, regardless of what our opponent's guess is.
@@ -206,7 +189,7 @@
 - So that is the general process of deriving the Bayesian optimal decision.
 - Using the same procedure, we could write a function that takes in values sampled from the predictive distribution to represent our belief and plot out the expected utility as a function of our guess.
 
-### Slide 17
+### Slide 16
 - Let's say for our specific example, we have a predictive belief about $P$ as a gaussian with mean $100 and standard deviation 10, and our opponent has guesses at 75.
 - Here I'm showing that plot that denotes the expected utility for potential guesses.
 - We see that everything below 75 has an expected utility of 0, since our guess is lower than our opponent's, and we are most likely not winning given our belief.
@@ -218,7 +201,7 @@
 - But overall, I hope that via this example, we can understand the concept of the Bayesian optimal decision and how to derive it better.
 - Moving, we will start talking about actual problems in machine learning that can greatly benefit from a Bayesian perspective.
 
-### Slide 18
+### Slide 17
 - We will start with one of the canonical problems in the Bayesian decision theory literature: the multi-armed bandit problem.
 - The setting we have is the following:
 - We have $k$ slot machines $1, 2, ..., k$, each of which returns a coin with probability $\theta_i$ when its arm is pulled.
@@ -240,7 +223,7 @@
 - That still leaves open the question of how to design a policy to pick one arm to pull at each iteration.
 - A good policy should prioritize arms that have high expected return rate and/or high variance in the posterior prediction distribution of the outcome, corresponding to exploitation and exploration.
 
-### Slide 19
+### Slide 18
 - One potential solution is to design the Bayesian optimal policy, which basically chooses the arm that in expectation will result in maximum current plus future reward.
 - For example, if we only have one pull left, the Bayesian optimal decision is to greedily pick the arm with the best return rate.
 - However, if there are two or more pulls left, the value of pulling an arm depends on not only the immediately expected reward from that arm, but also the expected impact it will have on our future beliefs and decisions, conditioned on the outcome of that arm.
@@ -250,7 +233,7 @@
 - It has been proven that the best we could do is a regret that behaves like a logarithmic function of the number of iterations $t$, so our goal is to have policies that have regret of this behavior.
 - Here we will discuss two of the most popular policies for this multi-armed bandit problem: UCB and Thompson Sampling.
 
-### Slide 20
+### Slide 19
 - There are many versions of the Upper-Confidence Bound, or UCB, policy, but in one Bayesian variant, we assign a point to each arm using this formula, which is a credible interval upper bound of the posterior distribution of the return rate variable.
 - At each iteration, the arm with the highest score will be pulled.
 - We see that this policy naturally balances exploration and exploitation by using this upper credible interval bound, since if an arm has a high empirical return rate, then the whole posterior credible interval will take on high values.
@@ -259,7 +242,7 @@
 - By using the scoring rule, we will sequentially explore the set of available machines and converge on one that gives out the best reward.
 - And that is the idea behind UCB.
 
-### Slide 21
+### Slide 20
 - The second policy we will take a look at is called Thompson Sampling.
 - Unlike UCB where the procedure of choosing the next arm to pull is deterministic, Thompson Sampling is a randomized policy, meaning that when faced with the same information, it is not guaranteed that the policy will make the same choice every time.
 - Again, at each iteration, we maintain a posterior belief about each $\theta_i$ as a probability distribution.
@@ -274,7 +257,7 @@
 - Okay, so that's the problem of multi-armed bandit and the two most common solutions to it.
 - Theoretically, we could actually prove that the expected regret resulting from applying either of these solutions does have a logarithmic trend, so it is a good guarantee to have when these policies are applied in real-life problems.
 
-### Slide 22
+### Slide 21
 - Now I want to move on to a somewhat related topic called Bayesian optimization.
 - In general, the term _Bayesian optimization_ denotes not a specific algorithm but a Bayesian framework of decision-making for optimization problems.
 - The setup for such a problem is simple.
@@ -301,7 +284,7 @@
 - If we have more than one query left, we would need to iterate through all possible queries, which are infinitely many, but also condition each possible outcome of each query to look ahead.
 - Therefore, in Bayesian optimization, we also need to design policy that approximates the Bayesian optimal one.
 
-### Slide 23
+### Slide 22
 - At each iteration, we have the posterior predictive distribution of the function value of each point in the domain.
 - This object gives rise to some of the most common Bayesian optimization policies.
 - For example, the _Probability of Improvement_ policy calculates the probability that the function value of each point is greater than the current maximum function value that we have observed, $\overline{y}$.
@@ -310,7 +293,7 @@
 - The posterior predictive distribution also allows us to use the GP equivalent of the UCB policy, which computes the credible interval upper bound of each unobserved point in the domain and chooses the maximizer.
 - We see that similar to what we have seen, all of these policies again balances the trade-off between exploration and exploitation by prioritizing points with large expected value or large uncertainty in its posterior distribution.
 
-### Slide 24
+### Slide 23
 - Given the posterior predictive distribution of the objective function, we can also consider the distribution of the location of the true maximizer of the function, $x^*$.
 - This object motivates several other optimization policies that seek to minimize the uncertainty about $x^*$ via their queries such as _Entropy Search_ and _Predictive Entropy Search_.
 - If this idea sounds strange to you, a minimal equivalent case is binary search of a sorted array.
@@ -324,7 +307,7 @@
 - Dan Foreman-Mackey is one of the authors of this tool, so I highly recommend checking out this work.
 - And with that, we reach the end of what I wanted to cover regarding Bayesian optimization.
 
-### Slide 25
+### Slide 26
 - Now, I want to briefly go over some other, more exotic, problems in machine learning where Bayesian decision theory thrives.
 - First, we have the subfield called active learning, where the goal is to identify minimal training data that will give a given ML model the best predictive performance.
 - If you are familiar with _Support Vector Machine_ classifiers, you might remember that if the training data is reduced to just the support vectors, which are the data points that are on the classification boundary, the resulting trained model will not change.
@@ -335,7 +318,7 @@
 - The ability to actively search for and make queries that are optimal in expectation with respect to a specific goal comes straight from our belief about our environment, represented as probability distributions and worked out using Bayesian decision theory.
 - Results of these subfields of ML can lead to cheaper and more efficient ML training in applications where, again, labeling is costly and uncertainty plays an important role such as clinical trials, fraud detection, or scientific experiments.
 
-### Slide 26
+### Slide 27
 - That also concludes my talk on Bayesian methods in machine learning.
 - Overall, we have discussed two specific topics: Bayesian modeling and Bayesian decision theory in the context of ML.
 - I hope I have convinced you that going from Bayes' theorem, we can design Bayesian frameworks to address problems in ML in a more informed, principled way.
