@@ -1,5 +1,4 @@
-# Bayesian methods in machine learning: a brief introduction
-## Transcripts
+# Transcripts
 
 ### Slide 1
 - We will start with the canonical problem in Bayesian interference: estimating the success rate of a binary event.
@@ -307,7 +306,7 @@
 - Dan Foreman-Mackey is one of the authors of this tool, so I highly recommend checking out this work.
 - And with that, we reach the end of what I wanted to cover regarding Bayesian optimization.
 
-### Slide 26
+### Slide 24
 - Now, I want to briefly go over some other, more exotic, problems in machine learning where Bayesian decision theory thrives.
 - First, we have the subfield called active learning, where the goal is to identify minimal training data that will give a given ML model the best predictive performance.
 - If you are familiar with _Support Vector Machine_ classifiers, you might remember that if the training data is reduced to just the support vectors, which are the data points that are on the classification boundary, the resulting trained model will not change.
@@ -318,7 +317,7 @@
 - The ability to actively search for and make queries that are optimal in expectation with respect to a specific goal comes straight from our belief about our environment, represented as probability distributions and worked out using Bayesian decision theory.
 - Results of these subfields of ML can lead to cheaper and more efficient ML training in applications where, again, labeling is costly and uncertainty plays an important role such as clinical trials, fraud detection, or scientific experiments.
 
-### Slide 27
+### Conclusion
 - That also concludes my talk on Bayesian methods in machine learning.
 - Overall, we have discussed two specific topics: Bayesian modeling and Bayesian decision theory in the context of ML.
 - I hope I have convinced you that going from Bayes' theorem, we can design Bayesian frameworks to address problems in ML in a more informed, principled way.
