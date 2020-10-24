@@ -2,10 +2,6 @@
 
 [PyMCon 2020 talk](https://discourse.pymc.io/t/bayesian-machine-learning-a-pymc-centric-introduction-by-quan-nguyen/5985)
 
-<figure class="video_container">
-  <iframe src="https://www.youtube.com/embed/Y7U8jhKtdBA" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
-
 Extra materials
 - Slide deck: [https://github.com/KrisNguyen135/BayesianML/blob/master/slides.pdf](https://github.com/KrisNguyen135/BayesianML/blob/master/slides.pdf)
 - Code for plots: [https://github.com/KrisNguyen135/BayesianML/tree/master/notebooks](https://github.com/KrisNguyen135/BayesianML/tree/master/notebooks)
