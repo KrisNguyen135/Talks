@@ -8,6 +8,7 @@ import matplotlib as mpl
 mpl.rcParams['axes.spines.right'] = False
 mpl.rcParams['axes.spines.top'] = False
 mpl.rcParams['font.family'] = 'sans-serif'
+mpl.rcParams['figure.figsize'] = [6.0, 4.0]
 
 from matplotlib.animation import FuncAnimation
 

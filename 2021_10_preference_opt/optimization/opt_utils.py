@@ -14,8 +14,8 @@ from itertools import combinations
 import matplotlib.pyplot as plt
 
 
-def generate_init_data(f, dim, n=2):
-    x = torch.rand(n, dim).float()
+def generate_init_data(f, dim, n=2, scale=1):
+    x = torch.rand(n, dim).float() * scale
     y = f(x)
     comp = compare(y)
 
