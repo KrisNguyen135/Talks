@@ -11,8 +11,11 @@ class IncumbentPolicy(BasePolicy):
         post_mean = lambda x: model(x).mean
 
         incumbent, incumbent_val = optimize_acqf(
-            post_mean, bounds=self.bounds, q=1,
-            num_restarts=self.n_restarts, raw_samples=self.n_raw_samples
+            post_mean,
+            bounds=self.bounds,
+            q=1,
+            num_restarts=self.n_restarts,
+            raw_samples=self.n_raw_samples,
         )
 
         return incumbent, incumbent_val
@@ -23,7 +26,9 @@ class IncumbentPolicy(BasePolicy):
 
         incumbent_ind = torch.argmax(mean_train)
 
-        return x_train[incumbent_ind].unsqueeze(0), mean_train[incumbent_ind].unsqueeze(0)
+        return x_train[incumbent_ind].unsqueeze(0), mean_train[incumbent_ind].unsqueeze(
+            0
+        )
 
     def find_rival(self, model, x_train):
         raise NotImplementedError
@@ -39,8 +44,11 @@ class IncumbentExpectedImprovement(IncumbentPolicy):
     def find_rival(self, model, x_train):
         acq_fn = qNoisyExpectedImprovement(model=model, X_baseline=x_train)
         rival, _ = optimize_acqf(
-            acq_function=acq_fn, bounds=self.bounds, q=1,
-            num_restarts=self.n_restarts, raw_samples=self.n_raw_samples
+            acq_function=acq_fn,
+            bounds=self.bounds,
+            q=1,
+            num_restarts=self.n_restarts,
+            raw_samples=self.n_raw_samples,
         )
 
         return rival

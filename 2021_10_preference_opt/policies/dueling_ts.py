@@ -32,7 +32,7 @@ class DuelingThompsonSampling(BasePolicy):
             x_test = torch.hstack([xs1.reshape(-1, 1), xs2.reshape(-1, 1)])
         else:
             print(bounds)
-            raise ValueError('Invalid dimensions')
+            raise ValueError("Invalid dimensions")
 
         self.x_test = x_test
 
@@ -58,7 +58,7 @@ class DuelingThompsonSampling(BasePolicy):
         # rescale
         x_test = x_test * (self.bounds[1] - self.bounds[0]) + self.bounds[0]
 
-        sampler = 'cholesky'
+        sampler = "cholesky"
         with ExitStack() as es:
             if sampler == "cholesky":
                 es.enter_context(gpts.max_cholesky_size(float("inf")))
@@ -66,7 +66,9 @@ class DuelingThompsonSampling(BasePolicy):
                 es.enter_context(gpts.fast_computations(covar_root_decomposition=True))
                 es.enter_context(gpts.max_cholesky_size(0))
                 es.enter_context(gpts.ciq_samples(True))
-                es.enter_context(gpts.minres_tolerance(2e-3))  # Controls accuracy and runtime
+                es.enter_context(
+                    gpts.minres_tolerance(2e-3)
+                )  # Controls accuracy and runtime
                 es.enter_context(gpts.num_contour_quadrature(15))
             elif sampler == "lanczos":
                 es.enter_context(gpts.fast_computations(covar_root_decomposition=True))
@@ -113,8 +115,11 @@ class DuelingThompsonSampling(BasePolicy):
             return torch.abs(torch.tensor(0.5) - z_cdf)
 
         rival, _ = optimize_acqf(
-            dueling_uncertainty, bounds=self.bounds, q=1,
-            num_restarts=self.n_restarts, raw_samples=self.n_raw_samples
+            dueling_uncertainty,
+            bounds=self.bounds,
+            q=1,
+            num_restarts=self.n_restarts,
+            raw_samples=self.n_raw_samples,
         )
 
         return torch.cat([ts_sample, rival])

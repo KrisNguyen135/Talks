@@ -5,8 +5,7 @@ import gpytorch
 from gpytorch.kernels import ScaleKernel, RBFKernel
 from gpytorch.constraints import Interval
 
-from botorch.models.pairwise_gp import PairwiseGP, \
-    PairwiseLaplaceMarginalLogLikelihood
+from botorch.models.pairwise_gp import PairwiseGP, PairwiseLaplaceMarginalLogLikelihood
 from botorch.fit import fit_gpytorch_model
 
 from itertools import combinations
@@ -86,39 +85,27 @@ def observe_and_append_data(x_next, f, noise, x_train, comp_train, tol=1e-3):
 
     ### first element
     dup_ind = torch.where(
-        torch.all(
-            torch.isclose(x_train, x_next[0], atol=tol),
-            axis=1
-        )
+        torch.all(torch.isclose(x_train, x_next[0], atol=tol), axis=1)
     )[0]
     if dup_ind.nelement() == 0:
         new_x_train = torch.cat([x_train, x_next[0].unsqueeze(-2)])
     else:
         # replace n with the duplicated index
         # decrement the other index
-        new_comp_next = torch.where(
-            new_comp_next == n,
-            dup_ind,
-            new_comp_next - 1
-        )
+        new_comp_next = torch.where(new_comp_next == n, dup_ind, new_comp_next - 1)
 
         n_dups += 1
 
     ### second element
     dup_ind = torch.where(
-        torch.all(
-            torch.isclose(new_x_train, x_next[1], atol=tol),
-            axis=1
-        )
+        torch.all(torch.isclose(new_x_train, x_next[1], atol=tol), axis=1)
     )[0]
     if dup_ind.nelement() == 0:
         new_x_train = torch.cat([new_x_train, x_next[1].unsqueeze(-2)])
     else:
         # replace n + 1 with the duplicated index
         new_comp_next = torch.where(
-            new_comp_next == n + 1 - n_dups,
-            dup_ind,
-            new_comp_next
+            new_comp_next == n + 1 - n_dups, dup_ind, new_comp_next
         )
 
     new_comp_train = torch.cat([comp_train, new_comp_next])
@@ -143,7 +130,7 @@ def plot_gaps(gaps, names):
     time = gaps.shape[2]
     xs = np.arange(time)
 
-    plt.axhline(1, c='r', linestyle='--')
+    plt.axhline(1, c="r", linestyle="--")
 
     for i, name in enumerate(names):
         tmp_gaps = gaps[i]
@@ -152,8 +139,6 @@ def plot_gaps(gaps, names):
         err_gaps = 2 * tmp_gaps.std(axis=0) / np.sqrt(n_trials)
 
         plt.plot(xs, mean_gaps, label=name)
-        plt.fill_between(
-            xs, mean_gaps + err_gaps, mean_gaps - err_gaps, alpha=0.1
-        )
+        plt.fill_between(xs, mean_gaps + err_gaps, mean_gaps - err_gaps, alpha=0.1)
 
     plt.legend()

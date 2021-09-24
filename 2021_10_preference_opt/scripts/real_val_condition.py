@@ -5,10 +5,11 @@ from sklearn.gaussian_process.kernels import RBF
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-mpl.rcParams['axes.spines.right'] = False
-mpl.rcParams['axes.spines.top'] = False
-mpl.rcParams['font.family'] = 'sans-serif'
-mpl.rcParams['figure.figsize'] = [6.0, 4.0]
+
+mpl.rcParams["axes.spines.right"] = False
+mpl.rcParams["axes.spines.top"] = False
+mpl.rcParams["font.family"] = "sans-serif"
+mpl.rcParams["figure.figsize"] = [6.0, 4.0]
 
 from matplotlib.animation import FuncAnimation
 
@@ -36,11 +37,11 @@ fig, ax = plt.subplots()
 line = ax.plot(x_test, prior_mean)[0]
 fill = ax.fill_between(x_test.flatten(), prior_lower, prior_upper, alpha=0.3)
 
-ax.plot(x_test, f(x_test), c='C1', linestyle='--')
-ax.scatter(x_train1, y_train1, c='k', marker='x')
+ax.plot(x_test, f(x_test), c="C1", linestyle="--")
+ax.scatter(x_train1, y_train1, c="k", marker="x")
 
-ax.set_xlabel('sugar in grams')
-ax.set_ylabel('utility')
+ax.set_xlabel("sugar in grams")
+ax.set_ylabel("utility")
 ax.set_ylim(-8, 8)
 
 ### Posterior belief
@@ -59,7 +60,7 @@ delta_upper = (posterior_upper - prior_upper) / n_frames
 
 def animate(i):
     # update the mean line
-    line.set_ydata(prior_mean + delta_mean  * i)
+    line.set_ydata(prior_mean + delta_mean * i)
 
     # update CI fill
     path = fill.get_paths()[0]
@@ -69,4 +70,4 @@ def animate(i):
 
 
 anim = FuncAnimation(fig, animate, interval=50, frames=n_frames, repeat=False)
-anim.save('conditioning1.gif', writer='imagemagick')
+anim.save("conditioning1.gif", writer="imagemagick")
