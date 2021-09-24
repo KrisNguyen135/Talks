@@ -19,7 +19,9 @@ def single_experiment(
     f,
     dim,
     x_opt,
+    bounds,
     acq_fn,
+    covar_module=None,
     noise=1e-6,
     budget=10,
     visualize_fn=None,
@@ -30,10 +32,16 @@ def single_experiment(
         progress_bar = False
 
     torch.manual_seed(seed)
-    x_train, comp_train = generate_init_data(f, dim)
+    x_train, comp_train = generate_init_data(
+        f,
+        dim,
+        scale=bounds[
+            :,
+        ],
+    )
     gaps = torch.tensor([0]).float()
 
-    model = fit_model(x_train, comp_train)
+    model = fit_model(x_train, comp_train, covar_module=covar_module)
     if visualize_fn is not None:
         visualize_fn(model, x_train, comp_train, f)
 
@@ -45,12 +53,12 @@ def single_experiment(
         )
         gaps = torch.cat([gaps, get_gap(x_train, f, x_opt)])
 
-        model = fit_model(x_train, comp_train)
+        model = fit_model(x_train, comp_train, covar_module=covar_module)
         if visualize_fn is not None:
-            print("Query", i + 1)
-            print(f"Compare {x_next[0]} against {x_next[1]}")
+            # print("Query", i + 1)
+            # print(f"Compare {x_next[0]} against {x_next[1]}")
             # print(model.covar_module.base_kernel.lengthscale.detach().numpy())
-            # visualize_fn(model, x_train, comp_train, f)
+            visualize_fn(model, x_train, comp_train, f)
 
     return x_train, comp_train, gaps
 
@@ -84,7 +92,14 @@ def repeated_experiments(
                 acq_fn_instance = acq_fn(tmp_bounds)
 
                 _, _, tmp_gaps = single_experiment(
-                    f, dim, x_opt, acq_fn_instance, noise=noise, budget=budget, seed=i
+                    f,
+                    dim,
+                    x_opt,
+                    tmp_bounds,
+                    acq_fn_instance,
+                    noise=noise,
+                    budget=budget,
+                    seed=i,
                 )
 
                 gaps[f_ind, acq_ind, i, :] = tmp_gaps
