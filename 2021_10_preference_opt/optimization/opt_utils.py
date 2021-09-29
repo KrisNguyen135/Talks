@@ -136,7 +136,7 @@ def plot_gaps(gaps, names):
         tmp_gaps = gaps[i]
 
         mean_gaps = tmp_gaps.mean(axis=0)
-        err_gaps = 2 * tmp_gaps.std(axis=0) / np.sqrt(n_trials)
+        err_gaps = tmp_gaps.std(axis=0) / np.sqrt(n_trials)
 
         plt.plot(xs, mean_gaps, label=name)
         plt.fill_between(xs, mean_gaps + err_gaps, mean_gaps - err_gaps, alpha=0.1)
