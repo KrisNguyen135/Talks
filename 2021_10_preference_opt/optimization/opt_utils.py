@@ -130,7 +130,7 @@ def plot_gaps(gaps, names):
     time = gaps.shape[2]
     xs = np.arange(time)
 
-    plt.axhline(1, c="r", linestyle="--")
+    plt.axhline(1, c="k", linestyle="--", alpha=0.5)
 
     for i, name in enumerate(names):
         tmp_gaps = gaps[i]
@@ -141,4 +141,4 @@ def plot_gaps(gaps, names):
         plt.plot(xs, mean_gaps, label=name)
         plt.fill_between(xs, mean_gaps + err_gaps, mean_gaps - err_gaps, alpha=0.1)
 
-    plt.legend()
+    # plt.legend(frameon=False)
