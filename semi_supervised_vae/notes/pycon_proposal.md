@@ -42,10 +42,10 @@ Q&A (3 minutes)
 
 # Other notes
 
-This talk is a cleaned-up version of a project I took part in for my graduate research, so this is a topic I'm quite familiar with and very excited to talk about!
-The idea is fairly simple and natural, but it doesn't seem like it's widely known among the deep learning community, so my hope is to help popularize this framework further.
+This talk is a cleaned-up version of a project I took part in for my graduate research, so it is a topic I'm quite familiar with and very excited to talk about!
+The idea is fairly simple and natural, but it hasn't been widely adopted by the deep learning community, so my hope is to help popularize this framework further.
 
 Parts of the talk will contain contents of [Martin Krasser's excellent blog post](https://github.com/krasserm/bayesian-machine-learning/blob/dev/autoencoder-applications/variational_autoencoder_opt.ipynb), which covers the same idea and some of the benefits of the model.
 
 This is my first time submitting to PyCon US!
-Some talks I have given at other venues are [this talk on Bayesian machine learning](https://discourse.pymc.io/t/bayesian-machine-learning-a-pymc-centric-introduction-by-quan-nguyen/5985) at last year's PyMCon and [this talk on preference learning and optimization](https://pydata.org/global2021/schedule/presentation/133/making-the-perfect-cup-of-joe-active-preference-learning-and-optimization-under-uncertainty/) at this year's PyData Global.
+Some talks I have given at other venues are [this talk on preference learning and optimization](https://pydata.org/global2021/schedule/presentation/133/making-the-perfect-cup-of-joe-active-preference-learning-and-optimization-under-uncertainty/) at this year's PyData Global and [this talk on Bayesian machine learning](https://discourse.pymc.io/t/bayesian-machine-learning-a-pymc-centric-introduction-by-quan-nguyen/5985) at last year's PyMCon.
