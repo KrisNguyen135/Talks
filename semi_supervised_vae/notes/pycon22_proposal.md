@@ -70,5 +70,5 @@ The idea is fairly simple and natural, but it hasn't been widely adopted by the 
 
 Some parts of the talk will overlap with [Martin Krasser's excellent blog post](https://github.com/krasserm/bayesian-machine-learning/blob/dev/autoencoder-applications/variational_autoencoder_opt.ipynb), which covers the same idea and some of the benefits of the model.
 
-This is my second time submitting to PyData Global.
-Some talks I have given at other venues are [this talk on preference learning and optimization](https://pydata.org/global2021/schedule/presentation/133/making-the-perfect-cup-of-joe-active-preference-learning-and-optimization-under-uncertainty/) at last year's PyData Global and [this talk on Bayesian machine learning](https://discourse.pymc.io/t/bayesian-machine-learning-a-pymc-centric-introduction-by-quan-nguyen/5985) at PyMCon 2020.
+This is my first time submitting to PyCon US!
+Some talks I have given at other venues are [this talk on preference learning and optimization](https://pydata.org/global2021/schedule/presentation/133/making-the-perfect-cup-of-joe-active-preference-learning-and-optimization-under-uncertainty/) at this year's PyData Global and [this talk on Bayesian machine learning](https://discourse.pymc.io/t/bayesian-machine-learning-a-pymc-centric-introduction-by-quan-nguyen/5985) at last year's PyMCon.
