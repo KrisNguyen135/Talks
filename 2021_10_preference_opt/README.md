@@ -1,6 +1,6 @@
 # Active Preference Learning and Optimization under Uncertainty
 
-[PyData 2021 talk]()
+[PyData Global 2021 talk](https://www.youtube.com/watch?v=WfJsS2KzBNo)
 
 Extra materials
 - [Slide deck](https://www.icloud.com/keynote/0oPmUGwFRfKM-GpsEFV0aqQXg#preference_optimization_%E2%80%94_pydata)
