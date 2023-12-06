@@ -2,13 +2,17 @@
 
 Information and supplementary materials from public talks are stored here, currently including:
 
+## But what is a Gaussian process? Regression while knowing how certain you are
+
+[PyData Global 2023 talk](https://github.com/KrisNguyen135/Talks/tree/main/2023_12_gp)
+
 ## Bayesian Optimization: Fundamentals, Implementation, and Practice
 
-[PyData 2022 talk](https://github.com/KrisNguyen135/Talks/tree/main/2022_12_bayesopt)
+[PyData Global 2022 talk](https://github.com/KrisNguyen135/Talks/tree/main/2022_12_bayesopt)
 
 ## Active Preference Learning and Optimization under Uncertainty
 
-[PyData 2021 talk](https://github.com/KrisNguyen135/Talks/tree/main/2021_10_preference_opt)
+[PyData Global 2021 talk](https://github.com/KrisNguyen135/Talks/tree/main/2021_10_preference_opt)
 
 ## Bayesian Machine Learning: A PyMC-Centric Introduction
 
