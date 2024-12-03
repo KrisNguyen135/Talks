@@ -2,6 +2,10 @@
 
 Information and supplementary materials from public talks are stored here, currently including:
 
+## Cost-effective data annotation with Bayesian experimental design
+
+[PyData Global 2024 talk](https://github.com/KrisNguyen135/Talks/tree/main/2024_12_bed)
+
 ## But what is a Gaussian process? Regression while knowing how certain you are
 
 [PyData Global 2023 talk](https://github.com/KrisNguyen135/Talks/tree/main/2023_12_gp)
